@@ -9,10 +9,11 @@ const ActividadSchema = new mongoose.Schema({
         default: 'social'
     },
     fecha: { type: Date, required: true },
-    hora: { type: String }, // Campo añadido para evitar errores
+    hora: { type: String }, 
     lugar: { type: String },
     imagenes: [{ type: String }], 
     fechaRegistro: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Actividad', ActividadSchema);
+// El tercer parámetro 'actividades' fuerza el uso de esa colección exacta
+module.exports = mongoose.model('Actividad', ActividadSchema, 'actividades');
