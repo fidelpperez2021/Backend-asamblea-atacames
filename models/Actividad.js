@@ -15,5 +15,4 @@ const ActividadSchema = new mongoose.Schema({
     fechaRegistro: { type: Date, default: Date.now }
 });
 
-// El tercer parámetro 'actividades' fuerza el uso de esa colección exacta
 module.exports = mongoose.model('Actividad', ActividadSchema, 'actividades');
