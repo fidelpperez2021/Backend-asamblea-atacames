@@ -5,19 +5,19 @@ require("dotenv").config();
 
 const app = express();
 
-// Configuración de CORS para permitir conexión desde el Frontend
+// 1. CONFIGURACIÓN
 app.use(cors());
 app.use(express.json());
 
-// Ruta de comprobación rápida
-app.get("/", (req, res) => res.send("✅ API Backend Asamblea Atacames funcionando"));
+// 2. RUTA DE PRUEBA
+app.get("/", (req, res) => res.send("✅ Backend Asamblea Atacames: TODO FUNCIONANDO"));
 
-// --- REGISTRO DE RUTAS ---
-// IMPORTANTE: Asegúrate que los archivos en /routes se llamen exactamente así
+// 3. REGISTRO DE TODAS LAS RUTAS
 app.use("/api/asambleistas", require("./routes/asambleistas"));
 app.use("/api/actividades", require("./routes/actividades"));
+app.use("/api/noticias", require("./routes/noticias")); // <--- RUTA DE NOTICIAS ACTIVADA
 
-// Conexión a Base de Datos
+// 4. CONEXIÓN A MONGO
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ Conectado a MongoDB Atlas"))
   .catch((err) => {
