@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Noticia = require('../models/Noticia');
 
-// @route   GET /api/noticias
-// @desc    Obtener todas las noticias (Ordenadas por la más reciente)
+// @route    GET /api/noticias
+// @desc     Obtener todas las noticias (Ordenadas por la más reciente)
 router.get('/', async (req, res) => {
     try {
         const noticias = await Noticia.find().sort({ fecha: -1 });
@@ -13,8 +13,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// @route   GET /api/noticias/:id
-// @desc    Obtener una noticia específica por ID
+// @route    GET /api/noticias/:id
 router.get('/:id', async (req, res) => {
     try {
         const noticia = await Noticia.findById(req.params.id);
@@ -25,8 +24,8 @@ router.get('/:id', async (req, res) => {
     }
 });
 
-// @route   POST /api/noticias
-// @desc    Publicar una nueva noticia
+// @route    POST /api/noticias
+// @desc     Publicar una nueva noticia
 router.post('/', async (req, res) => {
     const { titulo, resumen, contenido, imagen, categoria, fecha, autor } = req.body;
 
@@ -37,7 +36,7 @@ router.post('/', async (req, res) => {
             contenido,
             imagen,
             categoria,
-            fecha,
+            fecha: fecha || Date.now(),
             autor
         });
 
@@ -48,8 +47,24 @@ router.post('/', async (req, res) => {
     }
 });
 
-// @route   DELETE /api/noticias/:id
-// @desc    Eliminar una noticia (Solo desde el panel admin)
+// @route    PUT /api/noticias/:id
+// @desc     Actualizar una noticia existente
+router.put('/:id', async (req, res) => {
+    try {
+        const noticiaActualizada = await Noticia.findByIdAndUpdate(
+            req.params.id,
+            { $set: req.body },
+            { new: true } // Para que devuelva el objeto ya editado
+        );
+        
+        if (!noticiaActualizada) return res.status(404).json({ mensaje: 'No se encontró la noticia para editar' });
+        res.json(noticiaActualizada);
+    } catch (err) {
+        res.status(400).json({ mensaje: 'Error al actualizar noticia', error: err.message });
+    }
+});
+
+// @route    DELETE /api/noticias/:id
 router.delete('/:id', async (req, res) => {
     try {
         const noticia = await Noticia.findByIdAndDelete(req.params.id);
