@@ -17,6 +17,13 @@ const NoticiaSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+
+    // ✅ NUEVO CAMPO (opcional)
+    video: {
+        type: String,
+        default: ""
+    },
+
     categoria: {
         type: String,
         required: true
