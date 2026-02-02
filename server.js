@@ -15,7 +15,9 @@ app.get("/", (req, res) => res.send("✅ Backend Asamblea Atacames: TODO FUNCION
 // 3. REGISTRO DE TODAS LAS RUTAS
 app.use("/api/asambleistas", require("./routes/asambleistas"));
 app.use("/api/actividades", require("./routes/actividades"));
-app.use("/api/noticias", require("./routes/noticias")); // <--- RUTA DE NOTICIAS ACTIVADA
+app.use("/api/noticias", require("./routes/noticias")); 
+// NUEVA RUTA: Consejos Barriales
+app.use("/api/consejos-barriales", require("./routes/Consejos-barriales")); 
 
 // 4. CONEXIÓN A MONGO
 mongoose.connect(process.env.MONGO_URI)
