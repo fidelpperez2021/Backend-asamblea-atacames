@@ -6,29 +6,30 @@ require("dotenv").config();
 const app = express();
 
 // 1) CONFIGURACIÓN (CORS + JSON)
-// ✅ CORS completo (necesario para POST/PATCH/DELETE desde navegador)
 app.use(cors({
   origin: "*",
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// ✅ Preflight para navegador (MUY IMPORTANTE)
-app.options("*", cors());
+// ✅ Preflight sin usar app.options("*", ...), para evitar el error en Render
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 
-// ✅ Body parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // 2) RUTA DE PRUEBA
 app.get("/", (req, res) => res.send("✅ Backend Asamblea Atacames: TODO FUNCIONANDO"));
 
-// 3) REGISTRO DE TODAS LAS RUTAS (recomendado todo en minúsculas)
+// 3) REGISTRO DE TODAS LAS RUTAS (minúsculas recomendado)
 app.use("/api/asambleistas", require("./routes/asambleistas"));
 app.use("/api/actividades", require("./routes/actividades"));
 app.use("/api/noticias", require("./routes/noticias"));
 
-// ✅ NUEVA RUTA: Consejos Barriales (MINÚSCULAS para que coincida con el frontend)
+// ✅ Consejos Barriales en minúsculas (para que coincida con el frontend)
 app.use("/api/consejos-barriales", require("./routes/Consejos-barriales"));
 
 // 4) CONEXIÓN A MONGO
@@ -39,6 +40,5 @@ mongoose.connect(process.env.MONGO_URI)
     process.exit(1);
   });
 
-// 5) PUERTO
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Servidor corriendo en puerto ${PORT}`));
