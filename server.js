@@ -17,7 +17,7 @@ app.use("/api/asambleistas", require("./routes/asambleistas"));
 app.use("/api/actividades", require("./routes/actividades"));
 app.use("/api/noticias", require("./routes/noticias")); 
 // NUEVA RUTA: Consejos Barriales
-app.use("/api/consejos-barriales", require("./routes/Consejos-barriales")); 
+app.use("/api/Consejos-barriales", require("./routes/Consejos-barriales")); 
 
 // 4. CONEXIÓN A MONGO
 mongoose.connect(process.env.MONGO_URI)
