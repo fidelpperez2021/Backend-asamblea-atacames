@@ -1,62 +1,96 @@
 const mongoose = require('mongoose');
 
-const ConsejoBarrialSchema = new mongoose.Schema({
-    codigo: { type: String, required: true, unique: true },
-    nombre: { type: String, required: true },
-    parroquia: { type: String, required: true },
-    barrioSector: { type: String, required: true },
-    direccionReferencia: String,
-    
+const ConsejoBarrialSchema = new mongoose.Schema(
+  {
+    codigo: { type: String, required: true, unique: true, trim: true },
+    nombre: { type: String, required: true, trim: true },
+    parroquia: { type: String, required: true, trim: true },
+    barrioSector: { type: String, required: true, trim: true },
+    direccionReferencia: { type: String, trim: true },
+
     // Ubicación GeoJSON para mapas
     ubicacion: {
-        type: { type: String, enum: ['Point'], default: 'Point' },
-        coordinates: { type: [Number], required: true } // [longitud, latitud]
+      type: { type: String, enum: ['Point'], default: 'Point' },
+      coordinates: { type: [Number], required: true } // [longitud, latitud]
     },
 
-    estado: { type: String, enum: ['ACTIVO', 'INACTIVO', 'EN_PROCESO'], default: 'ACTIVO' },
-    fechaConformacion: Date,
+    estado: {
+      type: String,
+      enum: ['ACTIVO', 'INACTIVO', 'EN_PROCESO'],
+      default: 'ACTIVO'
+    },
+
+    fechaConformacion: { type: Date },
+
     periodo: {
-        inicio: Date,
-        fin: Date
+      inicio: { type: Date },
+      fin: { type: Date }
     },
 
     directiva: {
-        presidente: {
-            nombres: String,
-            cedula: String,
-            telefono: String,
-            email: String
-        },
-        secretario: { nombres: String, telefono: String },
-        tesorero: { nombres: String, telefono: String },
-        vocales: [{ nombres: String, telefono: String }]
+      presidente: {
+        nombres: { type: String, trim: true },
+        cedula: { type: String, trim: true },
+        telefono: { type: String, trim: true },
+        email: { type: String, trim: true, lowercase: true }
+      },
+      secretario: {
+        nombres: { type: String, trim: true },
+        telefono: { type: String, trim: true }
+      },
+      tesorero: {
+        nombres: { type: String, trim: true },
+        telefono: { type: String, trim: true }
+      },
+      vocales: [
+        {
+          nombres: { type: String, trim: true },
+          telefono: { type: String, trim: true }
+        }
+      ]
     },
 
-    poblacionAprox: Number,
-    numFamiliasAprox: Number,
-    prioridades: [String],
-    problematicas: [String],
+    poblacionAprox: { type: Number, default: 0 },
+    numFamiliasAprox: { type: Number, default: 0 },
+    prioridades: [{ type: String, trim: true }],
+    problematicas: [{ type: String, trim: true }],
 
     enlaceInstitucional: {
-        nombres: String,
-        telefono: String,
-        email: String
+      nombres: { type: String, trim: true },
+      telefono: { type: String, trim: true },
+      email: { type: String, trim: true, lowercase: true }
     },
 
-    docs: [{
-        tipo: String,
-        nombreArchivo: String,
-        url: String,
+    docs: [
+      {
+        tipo: { type: String, trim: true },
+        nombreArchivo: { type: String, trim: true },
+        url: { type: String, trim: true },
         fecha: { type: Date, default: Date.now }
-    }],
+      }
+    ],
 
-    observaciones: String,
-    tags: [String]
-}, { 
-    timestamps: true // Crea automáticamente createdAt y updatedAt
-});
+    observaciones: { type: String, trim: true },
+    tags: [{ type: String, trim: true }]
+  },
+  {
+    timestamps: true // createdAt y updatedAt
+  }
+);
+
+// Índice para permitir búsquedas por cercanía geográfica
+ConsejoBarrialSchema.index({ ubicacion: '2dsphere' });
+
+// ✅ IMPORTANTE: forzar el nombre exacto de la colección en Atlas
+module.exports = mongoose.model(
+  'ConsejoBarrial',
+  ConsejoBarrialSchema,
+  'Consejos-barriales' // <-- esto debe coincidir EXACTO
+);
+
 
 // Índice para permitir búsquedas por cercanía geográfica
 ConsejoBarrialSchema.index({ ubicacion: "2dsphere" });
+
 
 module.exports = mongoose.model('ConsejoBarrial', ConsejoBarrialSchema);
