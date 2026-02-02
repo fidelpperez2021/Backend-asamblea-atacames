@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const ConsejoBarrial = require("../models/Consejo-barrial");
 
-// ✅ Responder preflight OPTIONS (navegador)
-router.options("*", (req, res) => {
-  res.sendStatus(204);
+// ✅ Preflight OPTIONS (navegador) sin usar "*"
+router.use((req, res, next) => {
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
 });
 
 // OBTENER TODOS LOS CONSEJOS
@@ -84,3 +85,4 @@ router.delete("/:id", async (req, res) => {
 });
 
 module.exports = router;
+
