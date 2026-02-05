@@ -6,35 +6,30 @@ require("dotenv").config();
 const app = express();
 
 // 1) CONFIGURACIÓN (CORS + JSON)
-// ✅ CORS completo (necesario para POST/PATCH/DELETE desde navegador)
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// ✅ Preflight para navegador (IMPORTANTE)
-// ❌ NO uses "*" en Express nuevo
-// ✅ usa Regex:
+// Preflight
 app.options(/.*/, cors());
 
-// ✅ Body parsers
+// Body parsers
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // 2) RUTA DE PRUEBA
 app.get("/", (req, res) => res.send("✅ Backend Asamblea Atacames: TODO FUNCIONANDO"));
 
-// 3) REGISTRO DE TODAS LAS RUTAS (minúsculas recomendado)
+// 3) RUTAS
 app.use("/api/asambleistas", require("./routes/asambleistas"));
 app.use("/api/actividades", require("./routes/actividades"));
 app.use("/api/noticias", require("./routes/noticias"));
 
-// ✅ Consejos Barriales
-app.use("/api/consejos-barriales", require("./routes/Consejos-barriales"));
-
-// ✅ Consejos Rurales
-app.use("/api/consejos-rurales", require("./routes/Consejos-rurales"));
+// ✅ RECOMENDADO: archivos en minúsculas
+app.use("/api/consejos-barriales", require("./routes/consejos-barriales"));
+app.use("/api/consejos-rurales", require("./routes/consejos-rurales"));
 
 // 4) CONEXIÓN A MONGO
 mongoose.connect(process.env.MONGO_URI)
