@@ -28,8 +28,8 @@ app.use("/api/actividades", require("./routes/actividades"));
 app.use("/api/noticias", require("./routes/noticias"));
 
 // ✅ RECOMENDADO: archivos en minúsculas
-app.use("/api/consejos-barriales", require("./routes/consejos-barriales"));
-app.use("/api/consejos-rurales", require("./routes/consejos-rurales"));
+app.use("/api/consejos-barriales", require("./routes/Consejos-barriales"));
+app.use("/api/consejos-rurales", require("./routes/Consejos-rurales"));
 
 // 4) CONEXIÓN A MONGO
 mongoose.connect(process.env.MONGO_URI)
