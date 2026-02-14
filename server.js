@@ -34,8 +34,8 @@ app.use("/api/noticias", require("./routes/noticias"));
 
 // ✅ IMPORTANTE (Render):
 // Renombra estos archivos a minúsculas y cambia el require también:
-app.use("/api/consejos-barriales", require("./routes/consejos-barriales"));
-app.use("/api/consejos-rurales", require("./routes/consejos-rurales"));
+app.use("/api/consejos-barriales", require("./routes/Consejos-barriales"));
+app.use("/api/consejos-rurales", require("./routes/Consejos-rurales"));
 
 // ✅ NUEVO: SUSCRIPCIONES (nombre + correo, correo único)
 app.use("/api/suscripciones", require("./routes/suscripciones"));
