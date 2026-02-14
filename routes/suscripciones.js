@@ -3,6 +3,18 @@ const router = express.Router();
 const Subscriber = require("../models/Subscriber");
 
 /* =========================
+   GET → contador (ANTES de /:id)
+   ========================= */
+router.get("/count", async (req, res) => {
+  try {
+    const total = await Subscriber.countDocuments();
+    res.json({ ok: true, total });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: "Error al contar", error: err.message });
+  }
+});
+
+/* =========================
    GET → listar todos
    ========================= */
 router.get("/", async (req, res) => {
@@ -103,3 +115,4 @@ router.delete("/:id", async (req, res) => {
 });
 
 module.exports = router;
+
