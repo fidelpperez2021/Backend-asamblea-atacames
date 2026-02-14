@@ -2,35 +2,103 @@ const express = require("express");
 const router = express.Router();
 const Subscriber = require("../models/Subscriber");
 
+/* =========================
+   GET → listar todos
+   ========================= */
+router.get("/", async (req, res) => {
+  try {
+    const subscribers = await Subscriber.find().sort({ createdAt: -1 });
+    res.json({ ok: true, data: subscribers });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: "Error al listar", error: err.message });
+  }
+});
+
+/* =========================
+   GET → obtener uno por ID
+   ========================= */
+router.get("/:id", async (req, res) => {
+  try {
+    const subscriber = await Subscriber.findById(req.params.id);
+    if (!subscriber) {
+      return res.status(404).json({ ok: false, message: "No encontrado" });
+    }
+    res.json({ ok: true, data: subscriber });
+  } catch (err) {
+    res.status(400).json({ ok: false, message: "ID inválido" });
+  }
+});
+
+/* =========================
+   POST → crear
+   ========================= */
 router.post("/", async (req, res) => {
   try {
     const name = (req.body.name || "").trim();
     const email = (req.body.email || "").trim().toLowerCase();
 
     if (!name || !email) {
-      return res.status(400).json({ ok: false, message: "Nombre y correo son obligatorios." });
+      return res.status(400).json({ ok: false, message: "Nombre y correo obligatorios" });
     }
 
     const created = await Subscriber.create({ name, email });
 
-    return res.status(201).json({
+    res.status(201).json({
       ok: true,
-      message: "¡Suscripción creada!",
-      data: { id: created._id, name: created.name, email: created.email },
+      message: "Suscripción creada",
+      data: created,
     });
   } catch (err) {
-    // Error típico cuando el email ya existe (duplicate key)
-    if (err?.code === 11000) {
-      return res.status(409).json({ ok: false, message: "Ese correo ya está suscrito." });
+    if (err.code === 11000) {
+      return res.status(409).json({ ok: false, message: "Correo ya registrado" });
+    }
+    res.status(500).json({ ok: false, message: "Error al crear", error: err.message });
+  }
+});
+
+/* =========================
+   PUT → actualizar
+   ========================= */
+router.put("/:id", async (req, res) => {
+  try {
+    const update = {
+      name: req.body.name,
+      email: req.body.email?.toLowerCase(),
+    };
+
+    const updated = await Subscriber.findByIdAndUpdate(
+      req.params.id,
+      update,
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ ok: false, message: "No encontrado" });
     }
 
-    // Validaciones de mongoose (email inválido, etc.)
-    if (err?.name === "ValidationError") {
-      return res.status(400).json({ ok: false, message: err.message });
+    res.json({ ok: true, message: "Actualizado", data: updated });
+  } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({ ok: false, message: "Correo ya registrado" });
+    }
+    res.status(500).json({ ok: false, message: "Error al actualizar", error: err.message });
+  }
+});
+
+/* =========================
+   DELETE → eliminar
+   ========================= */
+router.delete("/:id", async (req, res) => {
+  try {
+    const deleted = await Subscriber.findByIdAndDelete(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({ ok: false, message: "No encontrado" });
     }
 
-    console.error(err);
-    return res.status(500).json({ ok: false, message: "Error interno del servidor." });
+    res.json({ ok: true, message: "Eliminado correctamente" });
+  } catch (err) {
+    res.status(400).json({ ok: false, message: "ID inválido" });
   }
 });
 
