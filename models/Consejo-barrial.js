@@ -1,5 +1,47 @@
 const mongoose = require("mongoose");
 
+/* ===============================
+   SUB-SCHEMAS PARA ACTIVIDADES
+================================ */
+
+const ImagenActividadSchema = new mongoose.Schema(
+  {
+    url: { type: String, required: true, trim: true },
+    titulo: { type: String, trim: true, default: "" }
+  },
+  { _id: false }
+);
+
+const ActividadSchema = new mongoose.Schema(
+  {
+    titulo: { type: String, required: true, trim: true },
+    descripcion: { type: String, trim: true, default: "" },
+    fecha: { type: Date },
+    lugar: { type: String, trim: true, default: "" },
+
+    estado: {
+      type: String,
+      enum: ["PROGRAMADA", "REALIZADA", "CANCELADA"],
+      default: "PROGRAMADA"
+    },
+
+    // ✅ hasta 20 imágenes
+    imagenes: {
+      type: [ImagenActividadSchema],
+      default: [],
+      validate: {
+        validator: (arr) => arr.length <= 20,
+        message: "Una actividad no puede tener más de 20 imágenes"
+      }
+    }
+  },
+  { timestamps: true }
+);
+
+/* ===============================
+   SCHEMA PRINCIPAL
+================================ */
+
 const ConsejoBarrialSchema = new mongoose.Schema(
   {
     codigo: { type: String, required: true, unique: true, trim: true },
@@ -10,21 +52,25 @@ const ConsejoBarrialSchema = new mongoose.Schema(
 
     ubicacion: {
       type: { type: String, enum: ["Point"], default: "Point" },
-      coordinates: { type: [Number], required: true },
+      coordinates: { type: [Number], required: true }
     },
 
     estado: {
       type: String,
       enum: ["ACTIVO", "INACTIVO", "EN_PROCESO"],
-      default: "ACTIVO",
+      default: "ACTIVO"
     },
 
     fechaConformacion: { type: String },
 
     periodo: {
       inicio: { type: Date },
-      fin: { type: Date },
+      fin: { type: Date }
     },
+
+    /* ===============================
+       DIRECTIVA
+    ================================ */
 
     directiva: {
       presidente: {
@@ -32,28 +78,30 @@ const ConsejoBarrialSchema = new mongoose.Schema(
         cedula: String,
         telefono: String,
 
-        // ✅ compatibles con tu frontend y Atlas
+        // compatibles con frontend
         foto: String,     // legacy
-        Perfil: String,   // foto de perfil
-        Portada: String,  // portada/banner
+        Perfil: String,   // foto perfil
+        Portada: String   // banner
       },
 
-      // ✅ formato normal
       Vicepresidente: { nombres: String, telefono: String, cedula: String },
       Secretario: { nombres: String, telefono: String, cedula: String },
       Tesorero: { nombres: String, telefono: String, cedula: String },
 
-      // ✅ por si en Atlas se guardó como "Vicepresidente:" (con dos puntos)
       "Vicepresidente:": { nombres: String, telefono: String, cedula: String },
 
-      // ✅ vocales con guiones (tal como en tu frontend)
       "1er-vocal": { nombres: String, telefono: String, cedula: String },
       "2do-vocal": { nombres: String, telefono: String, cedula: String },
       "3er-vocal": { nombres: String, telefono: String, cedula: String },
 
-      // ✅ vocales como array (compatibilidad)
-      vocales: [{ nombres: String, telefono: String, cargo: String, cedula: String }],
+      vocales: [
+        { nombres: String, telefono: String, cargo: String, cedula: String }
+      ]
     },
+
+    /* ===============================
+       DATOS SOCIALES
+    ================================ */
 
     poblacionAprox: { type: Number, default: 0 },
     numFamiliasAprox: { type: Number, default: 0 },
@@ -61,26 +109,44 @@ const ConsejoBarrialSchema = new mongoose.Schema(
     prioridades: [{ type: String, trim: true }],
     problematicas: [{ type: String, trim: true }],
 
-    // ✅ extra fields que tú ya estás usando en algunos docs (opcional pero recomendado)
+    /* ===============================
+       ACTIVIDADES DEL BARRIO
+    ================================ */
+
+    actividades: {
+      type: [ActividadSchema],
+      default: []
+    },
+
+    /* ===============================
+       DOCUMENTOS Y EXTRAS
+    ================================ */
+
     tags: [{ type: String, trim: true }],
+
     docs: [
       {
         tipo: { type: String, trim: true },
         nombreArchivo: { type: String, trim: true },
         url: { type: String, trim: true },
-        fecha: { type: String, trim: true },
-      },
+        fecha: { type: String, trim: true }
+      }
     ],
+
     observaciones: { type: String, trim: true },
 
     enlaceInstitucional: {
       nombres: { type: String, trim: true },
       telefono: { type: String, trim: true },
-      email: { type: String, trim: true },
-    },
+      email: { type: String, trim: true }
+    }
   },
   { timestamps: true }
 );
+
+/* ===============================
+   ÍNDICES
+================================ */
 
 ConsejoBarrialSchema.index({ ubicacion: "2dsphere" });
 
