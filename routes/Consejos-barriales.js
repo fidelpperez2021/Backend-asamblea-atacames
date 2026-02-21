@@ -73,6 +73,58 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// ===============================
+// ✅ AGREGAR ACTIVIDAD A UN CONSEJO
+// PUT /api/consejos-barriales/:id/actividades
+// Body: { actividad: { titulo, descripcion, fecha, lugar, estado, imagenes:[{url,titulo}] } }
+// ===============================
+router.put("/:id/actividades", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { actividad } = req.body;
+
+    if (!actividad || !actividad.titulo) {
+      return res.status(400).json({ mensaje: "Datos de actividad incompletos" });
+    }
+
+    if (actividad.imagenes && actividad.imagenes.length > 20) {
+      return res.status(400).json({ mensaje: "Máximo 20 imágenes por actividad" });
+    }
+
+    const consejo = await ConsejoBarrial.findById(id);
+    if (!consejo) {
+      return res.status(404).json({ mensaje: "Consejo Barrial no encontrado" });
+    }
+
+    // ✅ seguridad: si no existe el array, lo crea
+    if (!consejo.actividades) consejo.actividades = [];
+
+    consejo.actividades.push({
+      titulo: actividad.titulo,
+      descripcion: actividad.descripcion || "",
+      fecha: actividad.fecha ? new Date(actividad.fecha) : null,
+      lugar: actividad.lugar || "",
+      estado: actividad.estado || "PROGRAMADA",
+      imagenes: (actividad.imagenes || []).map((img) => ({
+        url: img.url,
+        titulo: img.titulo || ""
+      }))
+    });
+
+    await consejo.save();
+
+    res.json({
+      mensaje: "Actividad agregada correctamente",
+      actividad: consejo.actividades[consejo.actividades.length - 1]
+    });
+  } catch (err) {
+    res.status(500).json({
+      mensaje: "Error al agregar actividad",
+      error: err.message
+    });
+  }
+});
+
 // ELIMINAR CONSEJO
 router.delete("/:id", async (req, res) => {
   try {
@@ -85,4 +137,3 @@ router.delete("/:id", async (req, res) => {
 });
 
 module.exports = router;
-
