@@ -32,7 +32,9 @@ const ConsejoBarrialSchema = new mongoose.Schema(
         nombres: { type: String, trim: true },
         cedula: { type: String, trim: true },
         telefono: { type: String, trim: true },
-        email: { type: String, trim: true, lowercase: true }
+        email: { type: String, trim: true, lowercase: true },
+        // ✅ AGREGAMOS FOTO AQUÍ para que el frontend la pueda mostrar
+        foto: { type: String, trim: true, default: "" } 
       },
       secretario: {
         nombres: { type: String, trim: true },
@@ -45,10 +47,21 @@ const ConsejoBarrialSchema = new mongoose.Schema(
       vocales: [
         {
           nombres: { type: String, trim: true },
-          telefono: { type: String, trim: true }
+          telefono: { type: String, trim: true },
+          cargo: { type: String, trim: true } // Ejemplo: "Primer Vocal"
         }
       ]
     },
+
+    // ✅ Arreglo para Actividades (opcional, por si quieres mostrar fotos de eventos)
+    actividades: [
+      {
+        titulo: { type: String },
+        fecha: { type: String },
+        descripcion: { type: String },
+        imagenes: [{ type: String }]
+      }
+    ],
 
     poblacionAprox: { type: Number, default: 0 },
     numFamiliasAprox: { type: Number, default: 0 },
@@ -74,23 +87,17 @@ const ConsejoBarrialSchema = new mongoose.Schema(
     tags: [{ type: String, trim: true }]
   },
   {
-    timestamps: true // createdAt y updatedAt
+    timestamps: true 
   }
 );
 
 // Índice para permitir búsquedas por cercanía geográfica
 ConsejoBarrialSchema.index({ ubicacion: '2dsphere' });
 
-// ✅ IMPORTANTE: forzar el nombre exacto de la colección en Atlas
+// ✅ EXPORTACIÓN ÚNICA Y CORRECTA
+// Esto asegura que use la colección "Consejos-barriales" en MongoDB Atlas
 module.exports = mongoose.model(
   'ConsejoBarrial',
   ConsejoBarrialSchema,
-  'Consejos-barriales' // <-- esto debe coincidir EXACTO
+  'Consejos-barriales'
 );
-
-
-// Índice para permitir búsquedas por cercanía geográfica
-ConsejoBarrialSchema.index({ ubicacion: "2dsphere" });
-
-
-module.exports = mongoose.model('ConsejoBarrial', ConsejoBarrialSchema);
