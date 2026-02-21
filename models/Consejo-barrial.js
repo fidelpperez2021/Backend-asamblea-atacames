@@ -1,17 +1,47 @@
 const mongoose = require('mongoose');
 
+/**
+ * Esquema para la gestión de Consejos Barriales - Atacames
+ */
 const ConsejoBarrialSchema = new mongoose.Schema(
   {
-    codigo: { type: String, required: true, unique: true, trim: true },
-    nombre: { type: String, required: true, trim: true },
-    parroquia: { type: String, required: true, trim: true },
-    barrioSector: { type: String, required: true, trim: true },
-    direccionReferencia: { type: String, trim: true },
+    codigo: { 
+      type: String, 
+      required: true, 
+      unique: true, 
+      trim: true 
+    },
+    nombre: { 
+      type: String, 
+      required: true, 
+      trim: true 
+    },
+    parroquia: { 
+      type: String, 
+      required: true, 
+      trim: true 
+    },
+    barrioSector: { 
+      type: String, 
+      required: true, 
+      trim: true 
+    },
+    direccionReferencia: { 
+      type: String, 
+      trim: true 
+    },
 
-    // Ubicación GeoJSON para mapas
+    // Ubicación GeoJSON para integración con Google Maps o Leaflet
     ubicacion: {
-      type: { type: String, enum: ['Point'], default: 'Point' },
-      coordinates: { type: [Number], required: true } // [longitud, latitud]
+      type: { 
+        type: String, 
+        enum: ['Point'], 
+        default: 'Point' 
+      },
+      coordinates: { 
+        type: [Number], 
+        required: true 
+      } // [longitud, latitud]
     },
 
     estado: {
@@ -33,7 +63,7 @@ const ConsejoBarrialSchema = new mongoose.Schema(
         cedula: { type: String, trim: true },
         telefono: { type: String, trim: true },
         email: { type: String, trim: true, lowercase: true },
-        // ✅ AGREGAMOS FOTO AQUÍ para que el frontend la pueda mostrar
+        // URL de la imagen (Cloudinary, Firebase, etc.)
         foto: { type: String, trim: true, default: "" } 
       },
       secretario: {
@@ -53,7 +83,7 @@ const ConsejoBarrialSchema = new mongoose.Schema(
       ]
     },
 
-    // ✅ Arreglo para Actividades (opcional, por si quieres mostrar fotos de eventos)
+    // Registro de eventos del barrio
     actividades: [
       {
         titulo: { type: String },
@@ -74,6 +104,7 @@ const ConsejoBarrialSchema = new mongoose.Schema(
       email: { type: String, trim: true, lowercase: true }
     },
 
+    // Almacenamiento de documentos legales o actas
     docs: [
       {
         tipo: { type: String, trim: true },
@@ -87,15 +118,19 @@ const ConsejoBarrialSchema = new mongoose.Schema(
     tags: [{ type: String, trim: true }]
   },
   {
+    // Crea automáticamente los campos createdAt y updatedAt
     timestamps: true 
   }
 );
 
-// Índice para permitir búsquedas por cercanía geográfica
+// Índice geoespacial para permitir búsquedas por cercanía
 ConsejoBarrialSchema.index({ ubicacion: '2dsphere' });
 
-// ✅ EXPORTACIÓN ÚNICA Y CORRECTA
-// Esto asegura que use la colección "Consejos-barriales" en MongoDB Atlas
+/**
+ * EXPORTACIÓN
+ * Forzamos el nombre de la colección a 'Consejos-barriales' 
+ * para que coincida exactamente con tu base de datos en Atlas.
+ */
 module.exports = mongoose.model(
   'ConsejoBarrial',
   ConsejoBarrialSchema,
