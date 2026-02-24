@@ -3,14 +3,18 @@ const router = express.Router();
 const Subscriber = require("../models/Subscriber");
 
 /* =========================
-   GET → contador (ANTES de /:id)
+   GET → contador
    ========================= */
 router.get("/count", async (req, res) => {
   try {
     const total = await Subscriber.countDocuments();
     res.json({ ok: true, total });
   } catch (err) {
-    res.status(500).json({ ok: false, message: "Error al contar", error: err.message });
+    res.status(500).json({
+      ok: false,
+      message: "Error al contar",
+      error: err.message,
+    });
   }
 });
 
@@ -22,7 +26,11 @@ router.get("/", async (req, res) => {
     const subscribers = await Subscriber.find().sort({ createdAt: -1 });
     res.json({ ok: true, data: subscribers });
   } catch (err) {
-    res.status(500).json({ ok: false, message: "Error al listar", error: err.message });
+    res.status(500).json({
+      ok: false,
+      message: "Error al listar",
+      error: err.message,
+    });
   }
 });
 
@@ -47,13 +55,16 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const name = (req.body.name || "").trim();
-    const email = (req.body.email || "").trim().toLowerCase();
+    const cedula = (req.body.cedula || "").trim();
 
-    if (!name || !email) {
-      return res.status(400).json({ ok: false, message: "Nombre y correo obligatorios" });
+    if (!name || !cedula) {
+      return res.status(400).json({
+        ok: false,
+        message: "Nombre y cédula obligatorios",
+      });
     }
 
-    const created = await Subscriber.create({ name, email });
+    const created = await Subscriber.create({ name, cedula });
 
     res.status(201).json({
       ok: true,
@@ -62,9 +73,17 @@ router.post("/", async (req, res) => {
     });
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(409).json({ ok: false, message: "Correo ya registrado" });
+      return res.status(409).json({
+        ok: false,
+        message: "Cédula ya registrada",
+      });
     }
-    res.status(500).json({ ok: false, message: "Error al crear", error: err.message });
+
+    res.status(500).json({
+      ok: false,
+      message: "Error al crear",
+      error: err.message,
+    });
   }
 });
 
@@ -75,7 +94,7 @@ router.put("/:id", async (req, res) => {
   try {
     const update = {
       name: req.body.name,
-      email: req.body.email?.toLowerCase(),
+      cedula: req.body.cedula,
     };
 
     const updated = await Subscriber.findByIdAndUpdate(
@@ -88,12 +107,24 @@ router.put("/:id", async (req, res) => {
       return res.status(404).json({ ok: false, message: "No encontrado" });
     }
 
-    res.json({ ok: true, message: "Actualizado", data: updated });
+    res.json({
+      ok: true,
+      message: "Actualizado",
+      data: updated,
+    });
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(409).json({ ok: false, message: "Correo ya registrado" });
+      return res.status(409).json({
+        ok: false,
+        message: "Cédula ya registrada",
+      });
     }
-    res.status(500).json({ ok: false, message: "Error al actualizar", error: err.message });
+
+    res.status(500).json({
+      ok: false,
+      message: "Error al actualizar",
+      error: err.message,
+    });
   }
 });
 
