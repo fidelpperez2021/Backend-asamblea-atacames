@@ -9,20 +9,18 @@ const SubscriberSchema = new mongoose.Schema(
       minlength: 2,
       maxlength: 80,
     },
-    email: {
+    cedula: {
       type: String,
       required: true,
-      trim: true,
-      lowercase: true,
       unique: true, // importante
       index: true,  // importante
-      match: [/^\S+@\S+\.\S+$/, "Email inválido"],
+      match: [/^\d{10}$/, "La cédula debe tener 10 dígitos"],
     },
   },
   { timestamps: true }
 );
 
-// (Opcional pero recomendable) refuerza el unique index
-SubscriberSchema.index({ email: 1 }, { unique: true });
+// Refuerza el índice único
+SubscriberSchema.index({ cedula: 1 }, { unique: true });
 
 module.exports = mongoose.model("Subscriber", SubscriberSchema);
